@@ -7,10 +7,10 @@ January 2027, Hyundai Motor Group Yangjae Headquarters, Seoul.
 
 | Path | What it is |
 |---|---|
-| `why-forum-v1.html` | The whole site — a single self-contained file (markup, styles, and the 3D hero) |
+| `index.html` | The whole site — a single self-contained file (markup, styles, and the 3D hero) |
 | `logos/` | Partner marks, plus the untouched source files they were made from |
 
-Open `why-forum-v1.html` in a browser. No build step and no dependencies to install;
+Open `index.html` in a browser. No build step and no dependencies to install;
 Three.js and Inter load from a CDN at runtime.
 
 ## The hero
@@ -42,6 +42,12 @@ symbol scaled to the same height as a long wordmark reads much smaller than it
 should. Seoul Metropolitan Government and Hongik IDAS carry an extra manual boost,
 because both are symbol-plus-caption lockups whose bounding box overstates how big
 they actually look.
+
+## Hosting
+
+The entry file is `index.html`, so GitHub Pages serves it at the repository root.
+Enable it under **Settings → Pages → Build and deployment → Source: Deploy from a
+branch → `main` / `(root)`**. The site is fully static — nothing to build.
 
 ## Editing the content
 
