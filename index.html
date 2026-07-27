@@ -657,16 +657,21 @@ const group = new THREE.Group(); scene.add(group);
 
 const REDUCED = matchMedia('(prefers-reduced-motion:reduce)').matches;
 const SMALL = innerWidth < 700;
-const N = SMALL ? 520 : 1000;
+/* Phones get far fewer, far chunkier balls. Ball size relative to the field is
+   governed by the ball COUNT (roughly 1/N^⅓), not by the radius — scaling radius
+   alone just inflates the whole field to match. So the count drops to a fifth. */
+const N = SMALL ? 110 : 1000;
+const RAD_SCALE = SMALL ? 3.2 : 1;
 const R_BOUND = 44;                  // outer cage — only reached after a scatter click
-const DARK = 16;                     // first N dark spheres carry labels
+const DARK = SMALL ? 8 : 16;         // first N dark spheres carry labels
 
 /* cloud shape / spacing.
    GX === GZ makes the field a flat DISC rather than a slab, so spinning it on the
    Y axis never empties the left/right edges — the silhouette stays the same width. */
 const G      = 6.0;                  // pull toward centre
 const GX = .13, GY = 5.2, GZ = .13;
-const REP_R  = 2.7;                  // soft repulsion range (> ball diameter ⇒ gaps)
+// repulsion range must stay clear of the largest possible ball pair
+const REP_R  = SMALL ? 6.4 : 2.7;    // soft repulsion range (> ball diameter ⇒ gaps)
 const REP_K  = 120;                  // repulsion strength
 const DAMP   = .962;
 const JITTER = .05;                  // keeps the cloud gently breathing
@@ -690,9 +695,7 @@ for(let i=0;i<N;i++){
   do{ x=Math.random()*2-1; y=Math.random()*2-1; z=Math.random()*2-1; d=x*x+y*y+z*z; }while(d>1||d<.001);
   // seed close to the resting shape so the pre-warm is short
   P[i*3]=x*17; P[i*3+1]=y*3.5; P[i*3+2]=z*17;
-  // slightly chunkier balls on phones, where the field is scaled down
-  const rs = SMALL ? 1.25 : 1;
-  RAD[i] = (i<DARK ? .78 : (.42 + Math.random()*.36)) * rs;
+  RAD[i] = (i<DARK ? .78 : (.42 + Math.random()*.36)) * RAD_SCALE;
 }
 const CELL = REP_R;
 const dummy = new THREE.Object3D();
@@ -807,7 +810,7 @@ const LABELS = [
   {en:'create',         ko:'만들다'},
 ];
 const tagHost = document.getElementById('tags');
-const TAGS = LABELS.map((L,i)=>{
+const TAGS = LABELS.slice(0, DARK).map((L,i)=>{
   const el=document.createElement('div');
   el.className='tag3d'; el.textContent=L.en;
   tagHost.appendChild(el);
@@ -858,10 +861,19 @@ function up(e){
   if(dragging && moved<6) scatter(e);
   dragging=false; canvas.classList.remove('dragging');
 }
-canvas.addEventListener('pointerdown',down);
-addEventListener('pointermove',move);
-addEventListener('pointerup',up);
-canvas.addEventListener('pointercancel',()=>{dragging=false;canvas.classList.remove('dragging')});
+/* Phones: no drag, no tap-to-scatter. The canvas fills the first screen, so any
+   gesture handling here fights the page scroll — a swipe meant to scroll the page
+   was being swallowed as a rotate. Handing the touch straight back to the browser
+   is the only reliable fix; `touch-action:none` in the CSS has to go with it. */
+if(SMALL){
+  canvas.style.touchAction = 'auto';
+  canvas.style.cursor = 'default';
+}else{
+  canvas.addEventListener('pointerdown',down);
+  addEventListener('pointermove',move);
+  addEventListener('pointerup',up);
+  canvas.addEventListener('pointercancel',()=>{dragging=false;canvas.classList.remove('dragging')});
+}
 
 const ray = new THREE.Raycaster();
 const hitSphere = new THREE.Mesh(new THREE.SphereGeometry(R_BOUND,16,12), new THREE.MeshBasicMaterial({visible:false}));
@@ -895,7 +907,7 @@ function resize(){
   // narrow viewports: shrink the whole field instead of moving the camera,
   // so the perspective (and therefore the ball sizes) stay identical.
   // Top-down needs more shrink than edge-on — you see the disc's full face.
-  const floor = SMALL ? .34 : .42;
+  const floor = SMALL ? .26 : .42;
   group.scale.setScalar(Math.max(floor, Math.min(1, camera.aspect/1.9)));
 }
 addEventListener('resize',resize);
