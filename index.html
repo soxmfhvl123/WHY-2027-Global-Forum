@@ -196,37 +196,43 @@ section{padding-block:clamp(64px,9vw,140px)}
   display:grid;grid-template-columns:56px 1.05fr 1.5fr 140px 30px;
   gap:20px;align-items:center;
   padding:20px 0;border-bottom:1px solid var(--line);
-  position:relative;isolation:isolate;cursor:pointer;transition:padding .45s var(--ease);
+  position:relative;isolation:isolate;transition:padding .45s var(--ease);
 }
-.spk:hover{padding-inline:14px}
-.spk::before{
-  content:"";position:absolute;inset:0;background:var(--grad);z-index:-1;
-  transform:scaleY(0);transform-origin:bottom;transition:transform .45s var(--ease);
-}
-.spk:hover::before{transform:scaleY(1)}
 .spk .idx{font-size:12px;color:var(--ink-30);font-weight:600;transition:color .3s}
-.spk:hover .idx{color:#fff}
-.spk .name{transition:color .3s}
-.spk:hover .name{color:#fff}
-.spk:hover .topic .pill{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
-.spk .name{font-size:clamp(19px,2.5vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.spk .name{font-size:clamp(19px,2.5vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.1;transition:color .3s}
 .spk .role{font-size:13px;color:var(--ink-60);line-height:1.45;transition:color .3s;display:block}
 .spk .role b{display:block;font-weight:600;color:var(--ink);font-size:14px;margin-bottom:3px;transition:color .3s}
-.spk:hover .role b{color:#fff}
-.spk:hover .role{color:rgba(255,255,255,.85)}
-.spk:hover .arrow{color:#fff}
 .spk .topic{font-size:12px}
 .spk .arrow{justify-self:end;font-size:17px;opacity:.25;transition:.45s var(--ease)}
-.spk:hover .arrow{opacity:1;transform:translateX(4px)}
-.spk .thumb{
-  position:absolute;left:76%;top:50%;width:300px;height:380px;
-  background:var(--ink);border-radius:8px;overflow:hidden;
-  transform:translate(-50%,-50%) scale(.9);
-  opacity:0;pointer-events:none;transition:.5s var(--ease);z-index:3;
-  display:grid;place-items:center;color:#fff;font-size:11px;letter-spacing:.12em;
+.spk .thumb{display:none}
+
+/* Hover treatment is gated behind a real pointer. On a touch screen :hover latches
+   on after a tap and the row stays highlighted until you tap elsewhere, which reads
+   as a bug — so phones and tablets get none of it. */
+@media (hover:hover) and (pointer:fine){
+  .spk{cursor:pointer}
+  .spk:hover{padding-inline:14px;z-index:5}
+  .spk::before{
+    content:"";position:absolute;inset:0;background:var(--grad);z-index:-1;
+    transform:scaleY(0);transform-origin:bottom;transition:transform .45s var(--ease);
+  }
+  .spk:hover::before{transform:scaleY(1)}
+  .spk:hover .idx{color:#fff}
+  .spk:hover .name{color:#fff}
+  .spk:hover .topic .pill{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+  .spk:hover .role b{color:#fff}
+  .spk:hover .role{color:rgba(255,255,255,.85)}
+  .spk:hover .arrow{color:#fff;opacity:1;transform:translateX(4px)}
+  .spk .thumb{
+    display:grid;place-items:center;
+    position:absolute;left:76%;top:50%;width:300px;height:380px;
+    background:var(--ink);border-radius:8px;overflow:hidden;
+    transform:translate(-50%,-50%) scale(.9);
+    opacity:0;pointer-events:none;transition:.5s var(--ease);z-index:3;
+    color:#fff;font-size:11px;letter-spacing:.12em;
+  }
+  .spk:hover .thumb{opacity:1;transform:translate(-50%,-50%) scale(1)}
 }
-.spk:hover{z-index:5}
-.spk:hover .thumb{opacity:1;transform:translate(-50%,-50%) scale(1)}
 @media(max-width:900px){
   .spk{grid-template-columns:34px 1fr 26px;row-gap:6px}
   .spk .role{grid-column:2}
@@ -663,7 +669,7 @@ const SMALL = innerWidth < 700;
 const N = SMALL ? 110 : 1000;
 const RAD_SCALE = SMALL ? 3.2 : 1;
 const R_BOUND = 44;                  // outer cage — only reached after a scatter click
-const DARK = SMALL ? 8 : 16;         // first N dark spheres carry labels
+const DARK = SMALL ? 13 : 16;        // first N dark spheres carry labels
 
 /* cloud shape / spacing.
    GX === GZ makes the field a flat DISC rather than a slab, so spinning it on the
