@@ -60,6 +60,7 @@ header.nav{
 }
 .logo{font-size:15px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .logo .dot{width:11px;height:11px;border-radius:50%;background:#FF5500;display:inline-block}
+
 /* pinned to the true centre of the viewport, so it doesn't drift when the
    logo and the language toggle have different widths */
 .navlinks{
@@ -92,6 +93,13 @@ header.nav{
 }
 .hero-meta p{max-width:38ch;font-size:14px;line-height:1.5;color:var(--ink-60)}
 .hero-tag{position:absolute;top:calc(var(--pad) + 56px);left:var(--pad);display:flex;gap:8px;flex-wrap:wrap;z-index:10}
+.year-pill{border:none;cursor:pointer}
+.year-pill.on{background:var(--ink);color:#fff;box-shadow:none}
+.meta-pill{
+  opacity:0;transform:translateY(-4px);pointer-events:none;
+  transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.meta-pill.show{opacity:1;transform:none;pointer-events:auto}
 
 /* floating labels over 3d */
 .tag3d{
@@ -274,7 +282,7 @@ footer{padding:56px var(--pad) 30px}
 <body>
 
 <header class="nav">
-  <div class="logo"><span class="dot"></span>WHY : 2027<span style="opacity:.35;font-weight:500">KNOWLEDGE &amp; DESIGN</span></div>
+  <div class="logo"><span class="dot"></span>WHY GLOBAL FORUM</div>
   <nav class="navlinks">
     <a href="#about" data-en="About" data-ko="소개">About</a>
     <a href="#speakers" data-en="Speakers" data-ko="연사">Speakers</a>
@@ -289,8 +297,10 @@ footer{padding:56px var(--pad) 30px}
   <canvas id="scene"></canvas>
   <div id="tags"></div>
   <div class="hero-tag">
-    <span class="pill ghost" data-en="Jan 2027 · Hyundai Motor Group Yangjae HQ, Seoul" data-ko="2027년 1월 · 현대자동차그룹 양재사옥, 서울">Jan 2027 · Hyundai Motor Group Yangjae HQ, Seoul</span>
-    <span class="pill ghost" data-en="Humanity : Love &amp; Excellence" data-ko="Humanity : Love &amp; Excellence">Humanity : Love &amp; Excellence</span>
+    <a class="pill ghost year-pill" href="http://whyglobalforum.com" target="_blank" rel="noopener">2025</a>
+    <button class="pill ghost year-pill" id="pill2027" type="button">2027</button>
+    <span class="pill ghost meta-pill" id="metaDate" data-en="Jan 2027 · Hyundai Motor Group Yangjae HQ, Seoul" data-ko="2027년 1월 · 현대자동차그룹 양재사옥, 서울">Jan 2027 · Hyundai Motor Group Yangjae HQ, Seoul</span>
+    <span class="pill ghost meta-pill" id="metaTheme" data-en="Humanity : Love &amp; Excellence" data-ko="Humanity : Love &amp; Excellence">Humanity : Love &amp; Excellence</span>
   </div>
   <div class="hero-ui">
     <h1 class="hero-title"
@@ -601,6 +611,18 @@ document.querySelectorAll('.plogos').forEach(box=>{
 });
 
 /* =========================================================
+   YEAR PILLS — 2025 links out; 2027 reveals the date/theme pills
+   ========================================================= */
+(function(){
+  const p27 = document.getElementById('pill2027');
+  if(!p27) return;
+  p27.addEventListener('click', ()=>{
+    p27.classList.add('on');
+    document.querySelectorAll('.meta-pill').forEach(m=>m.classList.add('show'));
+  });
+})();
+
+/* =========================================================
    NAV — smooth scroll without writing a #hash into the URL.
    (A hash is why a reload used to drop you mid-page instead of at the top.)
    ========================================================= */
@@ -689,7 +711,7 @@ const SMALL = innerWidth < 700;
 /* Phones get far fewer, far chunkier balls. Ball size relative to the field is
    governed by the ball COUNT (roughly 1/N^⅓), not by the radius — scaling radius
    alone just inflates the whole field to match. So the count drops to a fifth. */
-const N = SMALL ? 110 : 1000;
+const N = SMALL ? 73 : 667;   // 2/3 of the original 110 / 1000
 const RAD_SCALE = SMALL ? 3.2 : 1;
 const R_BOUND = 44;                  // outer cage — only reached after a scatter click
 const DARK = SMALL ? 13 : 16;        // first N dark spheres carry labels
